@@ -9,11 +9,11 @@ if [ "$1" = "cloudflared" ] && [ "$2" = "tunnel" ]; then
     export NO_AUTOUPDATE=true
 
     if [ -n "${TUNNEL_NAME}" ]; then
-        >&2 echo "You cannot use TUNNEL_NAME with cego/cloudflared image, its auto generated" && exit 1
+        >&2 echo "You cannot use TUNNEL_NAME with firecow/cloudflared image, its auto generated" && exit 1
     fi
 
     if [ -n "${TUNNEL_FORCE_PROVISIONING_DNS}" ]; then
-        >&2 echo "You cannot use TUNNEL_FORCE_PROVISIONING_DNS with cego/cloudflared image, its determined via route dns command" && exit 1
+        >&2 echo "You cannot use TUNNEL_FORCE_PROVISIONING_DNS with firecow/cloudflared image, its determined via route dns command" && exit 1
     fi
 
     if [ -z "${TUNNEL_HOSTNAME}" ]; then
