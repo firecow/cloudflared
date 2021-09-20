@@ -39,8 +39,6 @@ if [ "$1" = "cloudflared" ] && [ "$2" = "tunnel" ]; then
 
     EXISTING_TUNNELS_JSON=$(cloudflared tunnel list --name "${TUNNEL_NAME}" --output json)
     if [ "${EXISTING_TUNNELS_JSON}" != "[]" ]; then
-        # echo "Cleaning connections for '${TUNNEL_NAME}'"
-        # cloudflared tunnel --loglevel warn cleanup "${TUNNEL_NAME}"
         echo "Deleting existing tunnel '${TUNNEL_NAME}'"
         cloudflared tunnel --loglevel warn delete "${TUNNEL_NAME}"
     else
