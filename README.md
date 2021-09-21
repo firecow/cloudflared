@@ -8,7 +8,7 @@ All that is needed is a cert.pem, TUNNEL_HOSTNAME and TUNNEL_URL
 
 ```yml
 services:
-  cloudflared
+  cloudflared:
     image: firecow/cloudflared:${FCF_IMAGE_VERSION}
     stop_grace_period: 1m
     environment:
