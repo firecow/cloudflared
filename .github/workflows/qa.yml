@@ -1,0 +1,18 @@
+on:
+  - push
+  - pull_request
+
+
+jobs:
+
+  hadolint:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Hadolint Action
+        uses: hadolint/hadolint-action@v1.6.0
+
