@@ -6,9 +6,6 @@ if [ "$1" = "cloudflared" ] && [ "$2" = "tunnel" ]; then
     # Prevent message about missing config file.
     echo "---" > /etc/cloudflared/config.yml
 
-    # Never auto update in docker containers.
-    export NO_AUTOUPDATE='true'
-
     if [ -n "${TUNNEL_NAME}" ]; then
         >&2 echo "You cannot use TUNNEL_NAME or --name with firecow/cloudflared image, its auto generated" && exit 1
     fi
@@ -26,11 +23,11 @@ if [ "$1" = "cloudflared" ] && [ "$2" = "tunnel" ]; then
     fi
 
     if [ -z "${TUNNEL_TRANSPORT_LOGLEVEL}" ]; then
-        export TUNNEL_TRANSPORT_LOGLEVEL=warn
+        export TUNNEL_TRANSPORT_LOGLEVEL=fatal
     fi
 
     if [ -z "${TUNNEL_LOGLEVEL}" ]; then
-        export TUNNEL_LOGLEVEL=warn
+        export TUNNEL_LOGLEVEL=fatal
     fi
 
     # function that prints info message, if TUNNEL_LOG_LEVEL is DEBUG or INFO
@@ -52,10 +49,8 @@ if [ "$1" = "cloudflared" ] && [ "$2" = "tunnel" ]; then
     fi
     printInfo "Creating new tunnel '${TUNNEL_NAME}'"
     cloudflared tunnel create "${TUNNEL_NAME}" 1> /dev/null
-    printInfo "Creating CNAME from '${TUNNEL_HOSTNAME}' to tunnel named '${TUNNEL_NAME}'"
     cloudflared tunnel route dns --overwrite-dns "${TUNNEL_NAME}" "${TUNNEL_HOSTNAME}"
     unset TUNNEL_HOSTNAME
-    printInfo "Tunnels are now active."
     exec "cloudflared" "tunnel"
 else
     exec "$@"
