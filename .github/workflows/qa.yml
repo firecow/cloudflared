@@ -7,12 +7,14 @@ jobs:
 
   hadolint:
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Check Out Repo
-        uses: actions/checkout@v2
-
-      - name: Hadolint Action
+      - uses: actions/checkout@v2
+      - name: Hadolint
         uses: hadolint/hadolint-action@v1.6.0
 
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@1.1.0
