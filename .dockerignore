@@ -1,3 +1,2 @@
 *
 !Dockerfile.entrypoint
-!cloudflared-tunnel-start
