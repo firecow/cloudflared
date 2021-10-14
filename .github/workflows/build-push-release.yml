@@ -29,4 +29,4 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: firecow/cloudflared:${{ github.ref }},firecow/cloudflared:latest
+          tags: firecow/cloudflared:${{ github.event.release.tag_name }},firecow/cloudflared:latest
