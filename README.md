@@ -1,5 +1,8 @@
 # Cloudflared
 
+[![build](https://img.shields.io/github/workflow/status/firecow/cloudflared/build)](https://github.com/firecow/cloudflared/actions)
+[![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com)
+
 Cloudflared "legacy" tunnels have been deprecated. A switch to named tunnels is needed.
 
 This image mimics the "niceness" of "legacy" tunnels, but uses named tunnels internally.
