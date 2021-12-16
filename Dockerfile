@@ -1,4 +1,4 @@
-FROM cloudflare/cloudflared:2021.12.0 as cloudflared
+FROM cloudflare/cloudflared:2021.12.1 as cloudflared
 FROM debian:bullseye-20210902-slim
 
 COPY --from=cloudflared /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
