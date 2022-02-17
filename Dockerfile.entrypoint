@@ -47,7 +47,7 @@ export NO_AUTOUPDATE="true"
 export TUNNEL_FORCE_PROVISIONING_DNS='false'
 derived_tunnel_name=$(echo "$TUNNEL_HOSTNAME" | sed "s/https:\/\///g")
 
-export TUNNEL_NAME=${TUNNEL_NAME:-$derived_tunnel_name}
+export TUNNEL_NAME="${TUNNEL_NAME:-$derived_tunnel_name}"
 
 existing_tunnels_json=$(cloudflared --loglevel 'error' tunnel list --name "${TUNNEL_NAME}" --output json)
 if [ "${existing_tunnels_json}" != "[]" ]; then
