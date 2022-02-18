@@ -19,3 +19,10 @@ services:
     volumes:
       - ./example.com.cert.pem:/etc/cloudflared/cert.pem
 ``` 
+
+These environment variables have other defaults than original.
+```shell
+TUNNEL_TRANSPORT_LOGLEVEL="error"
+TUNNEL_LOGLEVEL="error"
+TUNNEL_METRICS="localhost:2000"
+```
