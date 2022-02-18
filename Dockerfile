@@ -1,4 +1,4 @@
-FROM cloudflare/cloudflared:2022.2.0 as cloudflared
+FROM cloudflare/cloudflared:2022.2.1 as cloudflared
 FROM alpine:3.15.0
 
 COPY --from=cloudflared /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
