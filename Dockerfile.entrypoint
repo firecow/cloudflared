@@ -16,11 +16,11 @@ if [ ! -f /etc/cloudflared/config.yml ]; then
 fi
 
 if [ -n "${TUNNEL_NAME}" ]; then
-  echo >&2 "You cannot use TUNNEL_NAME its derived from TUNNEL_HOSTNAME" && exit 1
+  echo >&2 "You cannot use TUNNEL_NAME it's derived from TUNNEL_HOSTNAME" && exit 1
 fi
 
 if [ -n "${TUNNEL_FORCE_PROVISIONING_DNS}" ]; then
-  echo >&2 "You cannot use TUNNEL_FORCE_PROVISIONING_DNS with firecow/cloudflared image, its determined via route dns command" && exit 1
+  echo >&2 "You cannot use TUNNEL_FORCE_PROVISIONING_DNS it's determined via route dns command" && exit 1
 fi
 
 if [ -z "${TUNNEL_HOSTNAME}" ]; then

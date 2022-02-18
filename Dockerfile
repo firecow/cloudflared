@@ -9,7 +9,7 @@ WORKDIR /app/
 
 ENV TUNNEL_METRICS="localhost:2000"
 
-HEALTHCHECK --interval=5s --retries=6 --timeout=3s CMD wget ${TUNNEL_METRICS}/ready
+HEALTHCHECK --interval=5s --retries=6 --timeout=3s CMD wget -q ${TUNNEL_METRICS}/ready -O -
 
 ENTRYPOINT ["Dockerfile.entrypoint"]
 
