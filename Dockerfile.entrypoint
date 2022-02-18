@@ -31,19 +31,6 @@ if [ -z "${TUNNEL_URL}" ] && [ -z "${TUNNEL_UNIX_SOCKET}" ]; then
   echo >&2 "You need to specify TUNNEL_URL or TUNNEL_UNIX_SOCKET" && exit 1
 fi
 
-if [ -z "${TUNNEL_TRANSPORT_LOGLEVEL}" ]; then
-  printInfo "TUNNEL_TRANSPORT_LOGLEVEL defaulting to error"
-  export TUNNEL_TRANSPORT_LOGLEVEL=error
-fi
-
-if [ -z "${TUNNEL_LOGLEVEL}" ]; then
-  printInfo "TUNNEL_LOGLEVEL defaulting to error"
-  export TUNNEL_LOGLEVEL=error
-fi
-
-printInfo "NO_AUTOUPDATE defaulting to true"
-export NO_AUTOUPDATE="true"
-
 export TUNNEL_FORCE_PROVISIONING_DNS='false'
 derived_tunnel_name=$(echo "$TUNNEL_HOSTNAME" | sed "s,^.*://,,g")
 
@@ -58,7 +45,7 @@ else
 fi
 printInfo "Creating new named tunnel '${TUNNEL_NAME}'"
 cloudflared --loglevel 'error' tunnel create "${TUNNEL_NAME}" 1>/dev/null
-printInfo "Routing dns '${TUNNEL_HOSTNAME}' to tunnel '${TUNNEL_NAME}'"
+printInfo "Routing dns from '${TUNNEL_NAME}' to tunnel"
 cloudflared --loglevel 'error' tunnel route dns --overwrite-dns "${TUNNEL_NAME}" "${derived_tunnel_name}"
 unset TUNNEL_HOSTNAME
 

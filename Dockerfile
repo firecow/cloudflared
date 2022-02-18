@@ -7,6 +7,9 @@ COPY Dockerfile.entrypoint /usr/local/bin
 
 WORKDIR /app/
 
+ENV NO_AUTOUPDATE="true"
+ENV TUNNEL_TRANSPORT_LOGLEVEL="error"
+ENV TUNNEL_LOGLEVEL="error"
 ENV TUNNEL_METRICS="localhost:2000"
 
 HEALTHCHECK --interval=5s --retries=6 --timeout=3s CMD wget -q ${TUNNEL_METRICS}/ready -O -
