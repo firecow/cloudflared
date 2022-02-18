@@ -45,7 +45,7 @@ printInfo "NO_AUTOUPDATE defaulting to true"
 export NO_AUTOUPDATE="true"
 
 export TUNNEL_FORCE_PROVISIONING_DNS='false'
-derived_tunnel_name=$(echo "$TUNNEL_HOSTNAME" | sed "s/https:\/\///g")
+derived_tunnel_name=$(echo "$TUNNEL_HOSTNAME" | sed "s,^.*://,,g")
 
 export TUNNEL_NAME="${TUNNEL_NAME:-$derived_tunnel_name}"
 
