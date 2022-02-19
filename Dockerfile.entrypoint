@@ -4,10 +4,35 @@ set -e
 
 # function that prints info message, if TUNNEL_LOGLEVEL is DEBUG or INFO
 printInfo() {
-  if [ "${TUNNEL_LOGLEVEL}" != 'info' ] && [ "${TUNNEL_LOGLEVEL}" != 'debug' ]; then return 0; fi
+  echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info)$' || return 0
   formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
   echo "$formattedDate INF ${1}"
 }
+
+# function that prints fatal message and exits
+printAndExit() {
+  formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+  echo >&2 "$formattedDate FAT ${2}"
+  exit "${1}"
+}
+
+if [ -n "${TUNNEL_NAME}" ]; then
+  printAndExit $? "You cannot use TUNNEL_NAME it's derived from TUNNEL_HOSTNAME"
+fi
+
+if [ -n "${TUNNEL_FORCE_PROVISIONING_DNS}" ]; then
+  printAndExit $? "You cannot use TUNNEL_FORCE_PROVISIONING_DNS it's determined via route dns command";
+fi
+
+if [ -z "${TUNNEL_HOSTNAME}" ]; then
+  printAndExit $? "You need to specify TUNNEL_HOSTNAME";
+fi
+
+if [ -z "${TUNNEL_URL}" ] && [ -z "${TUNNEL_UNIX_SOCKET}" ]; then
+  printAndExit $? "You need to specify TUNNEL_URL or TUNNEL_UNIX_SOCKET";
+fi
+
+echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info|warn|error|fatal)$' || printAndExit $? "TUNNEL_LOGLEVEL must be debug|info|warn|error|fatal"
 
 # Prevent message about missing config file.
 if [ ! -f /etc/cloudflared/config.yml ]; then
@@ -15,26 +40,10 @@ if [ ! -f /etc/cloudflared/config.yml ]; then
   echo "---" >/etc/cloudflared/config.yml
 fi
 
-if [ -n "${TUNNEL_NAME}" ]; then
-  echo >&2 "You cannot use TUNNEL_NAME it's derived from TUNNEL_HOSTNAME" && exit 1
-fi
-
-if [ -n "${TUNNEL_FORCE_PROVISIONING_DNS}" ]; then
-  echo >&2 "You cannot use TUNNEL_FORCE_PROVISIONING_DNS it's determined via route dns command" && exit 1
-fi
-
-if [ -z "${TUNNEL_HOSTNAME}" ]; then
-  echo >&2 "You need to specify TUNNEL_HOSTNAME" && exit 1
-fi
-
-if [ -z "${TUNNEL_URL}" ] && [ -z "${TUNNEL_UNIX_SOCKET}" ]; then
-  echo >&2 "You need to specify TUNNEL_URL or TUNNEL_UNIX_SOCKET" && exit 1
-fi
-
 export TUNNEL_FORCE_PROVISIONING_DNS='false'
-derived_tunnel_name=$(echo "$TUNNEL_HOSTNAME" | sed "s,^.*://,,g")
+derived_tunnel_name=$(echo "${TUNNEL_HOSTNAME}" | sed "s,^.*://,,g")
 
-export TUNNEL_NAME="${TUNNEL_NAME:-$derived_tunnel_name}"
+export TUNNEL_NAME="${TUNNEL_NAME:-${derived_tunnel_name}}"
 
 existing_tunnels_json=$(cloudflared --loglevel 'error' tunnel list --name "${TUNNEL_NAME}" --output json)
 if [ "${existing_tunnels_json}" != "[]" ]; then
@@ -43,10 +52,13 @@ if [ "${existing_tunnels_json}" != "[]" ]; then
 else
   printInfo "No existing named tunnel found"
 fi
+
 printInfo "Creating new named tunnel '${TUNNEL_NAME}'"
 cloudflared --loglevel 'error' tunnel create "${TUNNEL_NAME}" 1>/dev/null
+
 printInfo "Routing dns from '${TUNNEL_NAME}' to tunnel"
 cloudflared --loglevel 'error' tunnel route dns --overwrite-dns "${TUNNEL_NAME}" "${derived_tunnel_name}"
+
 unset TUNNEL_HOSTNAME
 
 exec "$@"
