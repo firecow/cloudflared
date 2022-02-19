@@ -23,6 +23,10 @@ printAndExit() {
   exit "${1}"
 }
 
+if [ "$*" != "" ]; then
+  printAndExit 1 "You cannot use custom docker commands with this image '$*'"
+fi
+
 if [ -n "${TUNNEL_NAME}" ]; then
   printAndExit 1 "You cannot use TUNNEL_NAME it's derived from TUNNEL_HOSTNAME"
 fi
@@ -39,6 +43,7 @@ if [ -z "${TUNNEL_URL}" ] && [ -z "${TUNNEL_UNIX_SOCKET}" ]; then
   printAndExit 1 "You need to specify TUNNEL_URL or TUNNEL_UNIX_SOCKET"
 fi
 
+# Make sure TUNNEL_LOGLEVEL is valid
 echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info|warn|error|fatal)$' || printAndExit $? "TUNNEL_LOGLEVEL must be debug|info|warn|error|fatal"
 
 # Prevent message about missing config file.
@@ -49,19 +54,17 @@ fi
 
 export TUNNEL_FORCE_PROVISIONING_DNS='false'
 derived_tunnel_name=$(echo "${TUNNEL_HOSTNAME}" | sed "s,^.*://,,g")
-
 export TUNNEL_NAME="${TUNNEL_NAME:-${derived_tunnel_name}}"
 
+# Check for active connections and/or cleanup pending connections
 tunnel_info=$(cloudflared --loglevel error tunnel info --output json testhest.stocklydev.se)
-
 is_active=$(echo "${tunnel_info}" | jq '.conns[] | .conns[] | select(.is_pending_reconnect == false) | length' | wc -l)
 if [ "$is_active" != "0" ]; then
   printAndExit 1 "Active tunnels for '${TUNNEL_NAME}' found, shutting down"
 fi
-
-is_pending_reconnect=$(echo "${tunnel_info}" | jq '.conns[] | .conns[] | select(.is_pending_reconnect == true) | length' | wc -l)
-if [ "$is_pending_reconnect" != "0" ]; then
-  printError "Cleaning tunnels in pending reconnect '${TUNNEL_NAME}'"
+is_pending=$(echo "${tunnel_info}" | jq '.conns[] | .conns[] | select(.is_pending_reconnect == true) | length' | wc -l)
+if [ "$is_pending" != "0" ]; then
+  printError "Cleaning pending connections for '${TUNNEL_NAME}'"
   cloudflared --loglevel 'error' tunnel cleanup "${TUNNEL_NAME}"
 fi
 
@@ -81,4 +84,4 @@ cloudflared --loglevel 'error' tunnel route dns --overwrite-dns "${TUNNEL_NAME}"
 
 unset TUNNEL_HOSTNAME
 
-exec "$@"
+exec "cloudflared" "tunnel"
