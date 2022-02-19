@@ -6,7 +6,8 @@ set -e
 printInfo() {
   tunnel_loglevel=${TUNNEL_LOGLEVEL}
   if [ "${tunnel_loglevel}" != 'info' ] && [ "${tunnel_loglevel}" != 'debug' ]; then return 0; fi
-  echo "${1}"
+  formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+  echo "$formattedDate INF ${1}"
 }
 
 # Prevent message about missing config file.
