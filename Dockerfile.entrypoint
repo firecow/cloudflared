@@ -4,8 +4,7 @@ set -e
 
 # function that prints info message, if TUNNEL_LOGLEVEL is DEBUG or INFO
 printInfo() {
-  tunnel_loglevel=${TUNNEL_LOGLEVEL}
-  if [ "${tunnel_loglevel}" != 'info' ] && [ "${tunnel_loglevel}" != 'debug' ]; then return 0; fi
+  if [ "${TUNNEL_LOGLEVEL}" != 'info' ] && [ "${TUNNEL_LOGLEVEL}" != 'debug' ]; then return 0; fi
   formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
   echo "$formattedDate INF ${1}"
 }
