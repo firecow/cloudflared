@@ -2,11 +2,18 @@
 
 set -e
 
-# function that prints info message, if TUNNEL_LOGLEVEL is DEBUG or INFO
+# function that prints info message, if TUNNEL_LOGLEVEL is debug or info
 printInfo() {
   echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info)$' || return 0
   formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
   echo "$formattedDate INF ${1}"
+}
+
+# function that prints warn message, if TUNNEL_LOGLEVEL is debug, info, warn and error
+printError() {
+  echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info|warn|error)$' || return 0
+  formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+  echo "$formattedDate ERR ${1}"
 }
 
 # function that prints fatal message and exits
@@ -17,19 +24,19 @@ printAndExit() {
 }
 
 if [ -n "${TUNNEL_NAME}" ]; then
-  printAndExit $? "You cannot use TUNNEL_NAME it's derived from TUNNEL_HOSTNAME"
+  printAndExit 1 "You cannot use TUNNEL_NAME it's derived from TUNNEL_HOSTNAME"
 fi
 
 if [ -n "${TUNNEL_FORCE_PROVISIONING_DNS}" ]; then
-  printAndExit $? "You cannot use TUNNEL_FORCE_PROVISIONING_DNS it's determined via route dns command";
+  printAndExit 1 "You cannot use TUNNEL_FORCE_PROVISIONING_DNS it's determined via route dns command"
 fi
 
 if [ -z "${TUNNEL_HOSTNAME}" ]; then
-  printAndExit $? "You need to specify TUNNEL_HOSTNAME";
+  printAndExit 1 "You need to specify TUNNEL_HOSTNAME"
 fi
 
 if [ -z "${TUNNEL_URL}" ] && [ -z "${TUNNEL_UNIX_SOCKET}" ]; then
-  printAndExit $? "You need to specify TUNNEL_URL or TUNNEL_UNIX_SOCKET";
+  printAndExit 1 "You need to specify TUNNEL_URL or TUNNEL_UNIX_SOCKET"
 fi
 
 echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info|warn|error|fatal)$' || printAndExit $? "TUNNEL_LOGLEVEL must be debug|info|warn|error|fatal"
@@ -44,6 +51,19 @@ export TUNNEL_FORCE_PROVISIONING_DNS='false'
 derived_tunnel_name=$(echo "${TUNNEL_HOSTNAME}" | sed "s,^.*://,,g")
 
 export TUNNEL_NAME="${TUNNEL_NAME:-${derived_tunnel_name}}"
+
+tunnel_info=$(cloudflared --loglevel error tunnel info --output json testhest.stocklydev.se)
+
+is_active=$(echo "${tunnel_info}" | jq '.conns[] | .conns[] | select(.is_pending_reconnect == false) | length' | wc -l)
+if [ "$is_active" != "0" ]; then
+  printAndExit 1 "Active tunnels for '${TUNNEL_NAME}' found, shutting down"
+fi
+
+is_pending_reconnect=$(echo "${tunnel_info}" | jq '.conns[] | .conns[] | select(.is_pending_reconnect == true) | length' | wc -l)
+if [ "$is_pending_reconnect" != "0" ]; then
+  printError "Cleaning tunnels in pending reconnect '${TUNNEL_NAME}'"
+  cloudflared --loglevel 'error' tunnel cleanup "${TUNNEL_NAME}"
+fi
 
 existing_tunnels_json=$(cloudflared --loglevel 'error' tunnel list --name "${TUNNEL_NAME}" --output json)
 if [ "${existing_tunnels_json}" != "[]" ]; then

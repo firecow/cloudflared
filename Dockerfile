@@ -5,6 +5,8 @@ COPY --from=cloudflared /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-cer
 COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin
 COPY Dockerfile.entrypoint /usr/local/bin
 
+RUN apk add jq --no-cache
+
 WORKDIR /app/
 
 ENV NO_AUTOUPDATE="true"
