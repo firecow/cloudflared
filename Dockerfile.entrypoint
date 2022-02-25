@@ -53,11 +53,11 @@ if [ ! -f /etc/cloudflared/config.yml ]; then
 fi
 
 export TUNNEL_FORCE_PROVISIONING_DNS='false'
-derived_tunnel_name=$(echo "${TUNNEL_HOSTNAME}" | sed "s,^.*://,,g")
+derived_tunnel_name=$(echo "${TUNNEL_HOSTNAME}" | sed "s,^.*://,,g" | tr '[:upper:]' '[:lower:]')
 export TUNNEL_NAME="${TUNNEL_NAME:-${derived_tunnel_name}}"
 
 # Check for active connections and/or cleanup pending connections
-tunnel_info=$(cloudflared --loglevel error tunnel info --output json testhest.stocklydev.se)
+tunnel_info=$(cloudflared --loglevel error tunnel info --output json "${TUNNEL_NAME}")
 is_active=$(echo "${tunnel_info}" | jq '.conns[] | .conns[] | select(.is_pending_reconnect == false) | length' | wc -l)
 if [ "$is_active" != "0" ]; then
   printAndExit 1 "Active tunnels for '${TUNNEL_NAME}' found, shutting down"
