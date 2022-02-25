@@ -24,7 +24,7 @@ printAndExit() {
 }
 
 if [ "$*" != "" ]; then
-  printAndExit 1 "You cannot use custom docker commands with this image '$*'"
+  printAndExit 1 "You cannot use custom docker commands with this image '$*'. Use ---entrypoint=\"\" do disable this entrypoint script, if you are doing custom stuff"
 fi
 
 if [ -n "${TUNNEL_NAME}" ]; then
