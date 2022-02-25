@@ -1,3 +1,4 @@
 /.idea
 /cert.pem
 /test.sh
+docker-compose.yml
