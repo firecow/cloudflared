@@ -21,4 +21,4 @@ jobs:
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@1.1.0
         with:
-          additional_files: 'Dockerfile.entrypoint'
+          additional_files: 'firecow_cloudflared'
