@@ -23,5 +23,7 @@ services:
 These environment variables have other defaults than original.
 ```shell
 TUNNEL_TRANSPORT_LOGLEVEL="error"
-TUNNEL_METRICS="localhost:2000"
+TUNNEL_METRICS="localhost:2000" # See Dockerfile healthcheck
 ```
+
+Dockerfile CMD is set to `firecow_cloudflared`, overriding this in `docker-compose.yml` or `docker run` will bypass the DNS and named tunnel auto process. 
