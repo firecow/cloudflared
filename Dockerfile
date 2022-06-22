@@ -6,7 +6,7 @@ RUN apk add jq=1.6-r1 --no-cache
 COPY --from=cloudflared /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin
 
-COPY Dockerfile.entrypoint /usr/local/bin
+COPY firecow_cloudflared /usr/local/bin
 
 WORKDIR /app/
 
@@ -17,4 +17,4 @@ ENV TUNNEL_METRICS="localhost:2000"
 
 HEALTHCHECK --interval=5s --retries=6 --timeout=3s CMD wget -q ${TUNNEL_METRICS}/ready -O -
 
-ENTRYPOINT ["Dockerfile.entrypoint"]
+CMD ["firecow_cloudflared"]
