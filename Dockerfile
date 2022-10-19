@@ -1,4 +1,4 @@
-FROM crazymax/cloudflared:2022.9.0 as cloudflared
+FROM cloudflare/cloudflared:latest@sha256:db58bb38c3cd1c206999c2133d1355d86a0be40510685b9d21d87b0c0a8662e3 as cloudflared
 FROM alpine:3.16.2
 
 RUN apk add jq=1.6-r1 --no-cache
