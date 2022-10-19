@@ -46,12 +46,6 @@ fi
 # Make sure TUNNEL_LOGLEVEL is valid
 echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info|warn|error|fatal)$' || printAndExit $? "TUNNEL_LOGLEVEL must be debug|info|warn|error|fatal"
 
-# Prevent message about missing config file.
-if [ ! -f /etc/cloudflared/config.yml ]; then
-  printInfo "/etc/cloudflared/config.yml not found autogenerating one"
-  echo "---" >/etc/cloudflared/config.yml
-fi
-
 derived_tunnel_name=$(echo "${TUNNEL_HOSTNAME}" | sed "s,^.*://,,g" | tr '[:upper:]' '[:lower:]')
 unset TUNNEL_HOSTNAME
 
@@ -61,7 +55,23 @@ if [ -z "${exit_code}" ]; then
   base64 -d < /tmp/creds.json | jq '.["AccountTag"] = .a | .["TunnelID"] = .t | .["TunnelSecret"] = .s' > /etc/cloudflared/"${tunnel_id}".json
 fi
 
+# Add config file
+cat << EOF > /etc/cloudflared/config.yml
+---
+tunnel: ${tunnel_id}
+credentials-file: /etc/cloudflared/${tunnel_id}.json
+ingress:
+  - service: ${TUNNEL_URL:-$TUNNEL_UNIX_SOCKET}
+EOF
+unset TUNNEL_URL
+unset TUNNEL_UNIX_SOCKET
+
 if [ -n "${exit_code}" ]; then
+  if [ ! -f /etc/cloudflared/config.yml ]; then
+    printInfo "/etc/cloudflared/config.yml not found autogenerating one"
+    echo "---" >/etc/cloudflared/config.yml
+  fi
+
   printInfo "Creating new named tunnel '${derived_tunnel_name}'"
   cloudflared --loglevel 'error' tunnel create "${derived_tunnel_name}" 1>/dev/null
 
@@ -69,4 +79,4 @@ if [ -n "${exit_code}" ]; then
   cloudflared --loglevel 'error' tunnel route dns --overwrite-dns "${derived_tunnel_name}" "${derived_tunnel_name}"
 fi
 
-exec "cloudflared" "tunnel" "run" "${derived_tunnel_name}"
+exec "cloudflared" "tunnel" "run"

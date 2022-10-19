@@ -27,3 +27,6 @@ TUNNEL_METRICS="localhost:2000" # See Dockerfile healthcheck
 ```
 
 Dockerfile CMD is set to `firecow_cloudflared`, overriding this in `docker-compose.yml` or `docker run` will bypass the DNS and named tunnel auto process. 
+
+
+`TUNNEL_URL: http://webserver:8080` can be replaced with `TUNNEL_UNIX_SOCKET: unix://var/run/origin.sock`
