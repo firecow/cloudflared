@@ -9,13 +9,6 @@ printInfo() {
   echo "$formattedDate INF ${1}"
 }
 
-# function that prints warn message, if TUNNEL_LOGLEVEL is debug, info, warn and error
-printError() {
-  echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info|warn|error)$' || return 0
-  formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-  echo "$formattedDate ERR ${1}"
-}
-
 # function that prints fatal message and exits
 printAndExit() {
   formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
