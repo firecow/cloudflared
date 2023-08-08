@@ -1,5 +1,5 @@
 FROM cloudflare/cloudflared:2023.7.3 as cloudflared
-FROM alpine:3.18.2
+FROM alpine:3.18.3
 
 RUN apk add jq~=1.6 --no-cache
 
