@@ -1,7 +1,7 @@
 FROM cloudflare/cloudflared:2023.10.0 as cloudflared
-FROM alpine:3.18.4
+FROM alpine:3.19.0
 
-RUN apk add jq~=1.6 --no-cache
+RUN apk add jq~=1.7 --no-cache
 
 COPY --from=cloudflared /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin
