@@ -5,7 +5,7 @@ on:
     tags-ignore:
       - '**'
     branches:
-      - master
+      - main
   pull_request:
 
 
