@@ -24,7 +24,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@2.0.0
+        env:
+          SHELLCHECK_OPTS: --enable=all
         with:
+          severity: style
           additional_files: 'firecow_cloudflared'
 
   build:

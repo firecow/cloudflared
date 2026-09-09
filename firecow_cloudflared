@@ -4,15 +4,15 @@ set -e
 
 # function that prints info message, if TUNNEL_LOGLEVEL is debug or info
 printInfo() {
-  echo "${TUNNEL_LOGLEVEL}" | grep -q -E '^(debug|info)$' || return 0
+  echo "${TUNNEL_LOGLEVEL-}" | grep -q -E '^(debug|info)$' || return 0
   formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-  echo "$formattedDate INF ${1}"
+  echo "${formattedDate} INF ${1}"
 }
 
 # function that prints fatal message and exits
 printAndExit() {
   formattedDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-  echo >&2 "$formattedDate FAT ${2}"
+  echo >&2 "${formattedDate} FAT ${2}"
   exit "${1}"
 }
 
@@ -66,7 +66,7 @@ cat << EOF > /etc/cloudflared/config.yml
 tunnel: ${tunnel_id}
 credentials-file: /etc/cloudflared/${tunnel_id}.json
 ingress:
-  - service: ${TUNNEL_URL:-$TUNNEL_UNIX_SOCKET}
+  - service: ${TUNNEL_URL:-${TUNNEL_UNIX_SOCKET}}
 EOF
 
 unset TUNNEL_URL
